@@ -7,7 +7,7 @@
       <div class="card-body text-center">
         <input type="text" placeholder="Please fill your Name" v-model="userName" class="form-control" autofocus>
 
-        <button class="btn btn-primary mt-4" @click="createGame">Create a New Game</button>
+        <button class="btn btn-primary mt-5" @click="createGame">Create a New Game</button>
 
         <h3 class="m-2">or</h3>
         <div class="row">
