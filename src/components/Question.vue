@@ -75,9 +75,8 @@ export default {
         this.isCorrect = this.selectedChoice === this.correctChoice;
         this.responded = true; // Mark that the user has responded
 
-        // setTimeout(() => this.showResult = true, 3000);
-        //
-        //this.showResult = true;
+        setTimeout(() => this.showResult = true, 3000);
+        // this.showResult = true;
 
         }
       },
@@ -103,9 +102,10 @@ export default {
 .selected {
   background-color: #007bff; /* Customize the background color as needed */
   color: white;
+  font-weight: bold;
 }
 .blink_me {
-  animation: blinker 1.5s infinite;
+  animation: blinker 1.2s infinite;
 }
 
 .blink_me_faster {
@@ -113,14 +113,14 @@ export default {
 }
 
 .correct_answer{
-  background-color: darkgreen; /* Customize the background color as needed */
+  background-color: green; /* Customize the background color as needed */
+  color: white;
+  font-weight: bold;
 }
-.wrong_answer{
+.wrong_answer {
   background-color: red; /* Customize the background color as needed */
-
+  font-weight: normal;
 }
-
-
 @keyframes blinker {
   50% {
     opacity: 50;

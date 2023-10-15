@@ -1,12 +1,17 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import Question from "./components/Question.vue";
+import Home from "./components/Home.vue";
 </script>
 
 <template>
 <!--  <HelloWorld msg="Vite + Vue" />-->
   <div class="container">
-    <Question></Question>
+<!--    <Home></Home>-->
+<!--    <Question></Question>-->
+    <router-view></router-view>
+
+
   </div>
 
 </template>
