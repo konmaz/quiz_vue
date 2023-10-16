@@ -1,5 +1,4 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
 import Question from "./components/Question.vue";
 import Home from "./components/Home.vue";
 </script>
@@ -30,18 +29,18 @@ body{
 </style>
 <script>
 export default {
-  mounted() {
-    window.addEventListener('beforeunload', this.confirmRefresh);
-  },
-  beforeDestroy() {
-    window.removeEventListener('beforeunload', this.confirmRefresh);
-  },
-  methods: {
-    confirmRefresh(event) {
-      // Display a confirmation message when the user tries to refresh the page.
-      event.preventDefault();
-      event.returnValue = '';
-    },
-  },
+  // mounted() {
+  //   window.addEventListener('beforeunload', this.confirmRefresh);
+  // },
+  // beforeDestroy() {
+  //   window.removeEventListener('beforeunload', this.confirmRefresh);
+  // },
+  // methods: {
+  //   confirmRefresh(event) {
+  //     // Display a confirmation message when the user tries to refresh the page.
+  //     event.preventDefault();
+  //     event.returnValue = '';
+  //   },
+  // },
 };
 </script>

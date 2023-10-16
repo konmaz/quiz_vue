@@ -67,22 +67,35 @@ export default {
       flashing: false
     };
   },
-  computed: {},
+  setup(){
+
+  },
   methods: {
     respond(choice) {
       if (!this.responded) {
         this.selectedChoice = choice;
-        this.isCorrect = this.selectedChoice === this.correctChoice;
+        // this.isCorrect = this.selectedChoice === this.correctChoice;
         this.responded = true; // Mark that the user has responded
 
         setTimeout(() => this.showResult = true, 3000);
         // this.showResult = true;
-
         }
       },
-    toggleDarkMode() {
-      const body = document.body;
-      body.classList.toggle('dark-mode');
+    showQuestion(question, choices){
+      this.question = question;
+      this.choices = choices;
+      this.correctChoice = "";
+
+      this.selectedChoice = null;
+      this.showResult = false;
+      this.isCorrect = false;
+      this.responded = false;
+      this.flashing = false;
+    },
+    revealCorrectAnswer(correctChoice){
+      this.correctChoice = correctChoice;
+      this.isCorrect = this.selectedChoice === this.correctChoice;
+      this.showResult = true;
     }
     }
 }
