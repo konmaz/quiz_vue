@@ -11,12 +11,14 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faUsers, faUser, faKey } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faUser, faKey, faTriangleExclamation, faClock, faHeart} from '@fortawesome/free-solid-svg-icons'
 
 library.add(faUsers)
 library.add(faUser)
 library.add(faKey)
-
+library.add(faTriangleExclamation)
+library.add(faClock);
+library.add(faHeart)
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';

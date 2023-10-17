@@ -1,16 +1,11 @@
-<template >
+<template>
   <div class="container">
     <div class="card mt-2">
       <div class="card-body shadow-lg">
         <div class="d-flex justify-content-between">
-          <p class="text-start fw-light">Film</p>
-          <div class="d-flex fs-5">
-            <p>1500</p>
-
-          </div>
-
-          <div class="d-flex fs-4 ">
-            ⌛<p class="text-end fw-light">16</p>
+          <p class="text-start fw-light">{{ question_category }}</p>
+          <div class="fs-4 text-end">
+            <p class="fw-light">{{ timer }} <font-awesome-icon :icon="['fa', 'clock']"/></p>
           </div>
         </div>
         <p class="card-text fs-4 prevent-select" v-html="question"></p>
@@ -19,86 +14,123 @@
 
     <div class="quiz-grid mt-4 gap-3">
       <button
-          class="p-3 btn btn-outline-dark fs-3 shadow"
+          class="p-3 btn btn-secondary fs-3 shadow"
           v-for="(choice, index) in choices"
           :key="index"
           v-html="choice"
           @click.prevent="respond(choice)"
           :class="{
-            'selected': selectedChoice === choice,
-            'blink_me btn-primary':  selectedChoice === choice && !showResult,
-           'disabled': responded,
-           // 'blink_me' : selectedChoice === choice &&  showResult,
-           'wrong_answer' :  showResult && selectedChoice === choice && choice !== correctChoice,
-           'correct_answer blink_me_faster' : showResult && choice === correctChoice
-          }"
+          'selected': selectedChoice === choice,
+          'blink_me btn-primary': selectedChoice === choice && !showResult,
+          'disabled': responded,
+          'wrong_answer': showResult && selectedChoice === choice && choice !== correctChoice,
+          'correct_answer blink_me_faster': showResult && choice === correctChoice,
+        }"
       ></button>
     </div>
-
-
-<!--    <Scoreboard></Scoreboard>-->
-
-
-
-
+    <Scoreboard></Scoreboard>
   </div>
 </template>
 
 <script>
+import {ref, computed, onMounted} from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import Scoreboard from "./Scoreboard.vue";
 
 export default {
-  components: { Scoreboard },
+  components: {Scoreboard},
+  setup() {
+    const store = useStore();
+    const router = useRouter();
+    const room = store.state.room;
 
-  data() {
+    const timer = ref(20);
+    const question = ref('');
+    const question_category = ref('');
+    const choices = ref(['', '', '', '',]);
+
+    const selectedChoice = ref(null);
+    const correctChoice = ref('Justin Bieber');
+    const showResult = ref(false);
+
+    const isCorrect = computed(() => selectedChoice.value === correctChoice.value);
+
+    const responded = ref(true);
+    const flashing = ref(false);
+
+    onMounted(() => {
+
+      if (room == null) {
+        router.replace('/'); // return to the home page and don't continue executing the code
+        return {};
+      }
+
+      room.state.listen('timer', (currentValue, previousValue) => {
+        timer.value = currentValue;
+      });
+
+      room.state.listen('questionCategory', (currentValue, previousValue) => {
+        question_category.value = currentValue;
+      });
+
+      room.state.listen('correctAnswer', (currentValue, previousValue) => {
+        correctChoice.value = currentValue;
+        if (currentValue !== ""){
+          showResult.value = true;
+          flashing.value = true;
+        }
+        if (currentValue === "")
+          resetQuestionState();
+      });
+
+      room.state.listen('question', (currentValue, previousValue) => {
+        resetQuestionState();
+        question.value = currentValue;
+      });
+
+      room.state.answers.onChange((value, key) => {
+        // Update playerUsernames when the players change
+        choices.value = Array.from(room.state.answers.values());
+      });
+
+
+      console.log(room);
+    });
+
+    const respond = (choice) => {
+      if (!responded.value) {
+        selectedChoice.value = choice;
+        responded.value = true;
+        room.send('answer_question', {answer:choice})
+        // setTimeout(() => (showResult.value = true), 3000);
+      }
+    };
+
+    const resetQuestionState = () => {
+      showResult.value = false;
+      responded.value = false;
+      flashing.value = false;
+      correctChoice.value = '';
+      selectedChoice.value = null;
+    };
+
+
     return {
-      question: 'Which musical artist had a prominent role in the 2017 film &quot;Kingsman: The Golden Circle&quot;?',
-      choices: {
-        choice1: 'Elton John',
-        choice2: 'Lady Gaga',
-        choice3: 'Rihanna',
-        choice4: 'Justin Bieber',
-      },
-      selectedChoice: null,
-      correctChoice: 'Justin Bieber',
-      showResult: false,
-      isCorrect: false,
-      responded: false, // Track if the user has already responded
-      flashing: false
+      timer,
+      question,
+      choices,
+      selectedChoice,
+      correctChoice,
+      showResult,
+      isCorrect,
+      responded,
+      flashing,
+      respond,
+      question_category
     };
   },
-  setup(){
-
-  },
-  methods: {
-    respond(choice) {
-      if (!this.responded) {
-        this.selectedChoice = choice;
-        // this.isCorrect = this.selectedChoice === this.correctChoice;
-        this.responded = true; // Mark that the user has responded
-
-        setTimeout(() => this.showResult = true, 3000);
-        // this.showResult = true;
-        }
-      },
-    showQuestion(question, choices){
-      this.question = question;
-      this.choices = choices;
-      this.correctChoice = "";
-
-      this.selectedChoice = null;
-      this.showResult = false;
-      this.isCorrect = false;
-      this.responded = false;
-      this.flashing = false;
-    },
-    revealCorrectAnswer(correctChoice){
-      this.correctChoice = correctChoice;
-      this.isCorrect = this.selectedChoice === this.correctChoice;
-      this.showResult = true;
-    }
-    }
-}
+};
 </script>
 
 <style scoped>
@@ -113,8 +145,8 @@ export default {
 
 /* Style for the selected choice */
 .selected {
-  background-color: #007bff; /* Customize the background color as needed */
-  color: white;
+  background-color: var(--bs-warning); /* Customize the background color as needed */
+  color: black;
   font-weight: bold;
 }
 .blink_me {
@@ -125,7 +157,7 @@ export default {
   animation: blinker 0.8s linear infinite;
 }
 
-.correct_answer{
+.correct_answer {
   background-color: green; /* Customize the background color as needed */
   color: white;
   font-weight: bold;
@@ -133,13 +165,11 @@ export default {
 .wrong_answer {
   background-color: red; /* Customize the background color as needed */
   font-weight: normal;
+  text-decoration: line-through ;
 }
 @keyframes blinker {
   50% {
     opacity: 50;
   }
 }
-
-
-
 </style>

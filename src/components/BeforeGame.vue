@@ -18,10 +18,10 @@
             <font-awesome-icon :icon="['fas', 'key']"/>
             Room code
           </h3>
-          <span class="badge rounded-pill text-bg-warning fs-2">{{ roomId }}</span>
+          <span class="badge rounded-pill text-bg-warning fs-2 font-monospace">{{ roomId }}</span>
         </div>
         <div class="d-grid gap-1">
-          <button class="btn btn-success mt-4 shadow-lg" @click="createGame">Start Game</button>
+          <button class="btn btn-success mt-4 shadow-lg" @click="startGame">Start Game</button>
           <button class="btn btn-danger mt-4" @click="exitGame">Exit</button>
         </div>
 
@@ -57,19 +57,20 @@
 
 <script>
 import {useStore} from 'vuex';
-import {ref} from 'vue';
+import {onUnmounted, ref} from 'vue';
 import {useRouter} from "vue-router";
 
 export default {
   name: 'BeforeGame',
   setup() {
+
     let roomId = 0;
     const store = useStore();
     const router = useRouter();
     const room = store.state.room;
 
     if (room == null) {
-      router.replace('/'); // return to home page and dont continue excecuting the code after
+      router.replace('/'); // return to home page and don't continue executing the code after
       return {
         roomId,
         playerUsernames: [],
@@ -82,19 +83,23 @@ export default {
     roomId = room.roomId;
     const playerUsernames = ref([]);
 
-    room.state.listen('trivia_category', (currentValue, previousValue) => {
+    room.state.listen("trivia_category", (currentValue, previousValue) => {
       console.log(`trivia_category is now ${currentValue}`);
       console.log(`trivia_category value was: ${previousValue}`);
     });
 
     room.onMessage("players_get_ready", (message) => {
-      console.log("Game started!");
+      router.replace("/game")
     });
 
     room.state.players.onChange((value, key) => {
       // Update playerUsernames when the players change
       playerUsernames.value = Array.from(room.state.players.values()).map((player) => player.username);
     });
+
+    const startGame = () =>{
+      room.send('start_game')
+    }
 
     const exitGame = () => {
       room.removeAllListeners();
@@ -105,7 +110,8 @@ export default {
     return {
       roomId,
       playerUsernames,
-      exitGame
+      exitGame,
+      startGame
     };
   },
 };

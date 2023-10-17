@@ -6,7 +6,7 @@ import BeforeGame from "./components/BeforeGame.vue";
 const routes = [
     { path: '/', component: Home },
     { path: '/pre_game', component: BeforeGame },
-    { path: '/question', component: Question },
+    { path: '/game', component: Question },
 
 ];
 
