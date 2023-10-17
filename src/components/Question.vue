@@ -140,7 +140,7 @@ export default {
   grid-template-columns: repeat(2, 1fr);
   grid-auto-rows: 1fr;
   min-height: 15em;
-  background: white;
+  background: var(--bs-body-bg);
 }
 
 /* Style for the selected choice */
