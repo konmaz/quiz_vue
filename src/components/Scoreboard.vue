@@ -7,6 +7,8 @@ export default {
     }
   }
 }
+function nth(n){return["st","nd","rd"][((n+90)%100-10)%10-1]||"th"}
+
 </script>
 
 <template>
@@ -23,6 +25,7 @@ export default {
           <tbody>
           <tr v-for="(username, index) in playerUsernames" :key="index"
               :class="{'fw-bolder table-primary' : index === 0}">
+            <td>{{index + 1 }}</td>
             <td>
               <font-awesome-icon
                   :icon="['fas', 'user']"
