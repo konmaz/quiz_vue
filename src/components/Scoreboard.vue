@@ -1,15 +1,4 @@
-<script>
-export default {
-  name: "Scoreboard",
-  data(){
-    return{
-      playerUsernames : ["Maria", "Nikos", "George"]
-    }
-  }
-}
-function nth(n){return["st","nd","rd"][((n+90)%100-10)%10-1]||"th"}
 
-</script>
 
 <template>
   <div class="container">
@@ -23,23 +12,25 @@ function nth(n){return["st","nd","rd"][((n+90)%100-10)%10-1]||"th"}
       <div class="card-body">
         <table class="table ">
           <tbody>
-          <tr v-for="(username, index) in playerUsernames" :key="index"
-              :class="{'fw-bolder table-primary' : index === 0}">
-            <td>{{index + 1 }}</td>
+          <tr v-for="[key, value] of foo"
+              :key="key"
+              :class="{'fw-bolder table-primary' : key === playerID}"
+          >
+<!--            <td>{{ (index +1)+nth(index + 1) }}</td>-->
             <td>
               <font-awesome-icon
                   :icon="['fas', 'user']"
                   class="text-primary"
               />
-              {{ username }}
+              {{ value.username }}
             </td>
             <td>
-              <span v-for="heartIndex in 3">
+              <span v-for="heartIndex in value.lives">
             <font-awesome-icon :key="heartIndex" :icon="['fas', 'heart']" class="text-danger fw-bolder"/>
           </span>
             </td>
             <td>
-              1500
+              {{value.score}}
             </td>
           </tr>
           </tbody>
@@ -48,10 +39,30 @@ function nth(n){return["st","nd","rd"][((n+90)%100-10)%10-1]||"th"}
     </div>
 
 
-
   </div>
 </template>
 
 <style scoped>
 
 </style>
+<script>
+let foo;
+export default {
+  name: "Scoreboard",
+  props:{
+    foo: Array,
+    playerID: String,
+  },
+  data() {
+    return {
+    }
+  },
+  methods:{
+    nth(n) {
+      return ["st", "nd", "rd"][((n + 90) % 100 - 10) % 10 - 1] || "th"
+    }
+  }
+}
+
+
+</script>

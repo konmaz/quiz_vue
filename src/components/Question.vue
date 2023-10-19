@@ -28,7 +28,7 @@
         }"
       ></button>
     </div>
-    <Scoreboard></Scoreboard>
+    <Scoreboard :foo="playersList" :player-i-d="sessionId"></Scoreboard>
   </div>
 </template>
 
@@ -45,10 +45,14 @@ export default {
     const router = useRouter();
     const room = store.state.room;
 
+    const sessionId = ref('');
+
     const timer = ref(20);
     const question = ref('');
     const question_category = ref('');
     const choices = ref(['', '', '', '',]);
+
+    const playersList = ref([]);
 
     const selectedChoice = ref(null);
     const correctChoice = ref('Justin Bieber');
@@ -65,6 +69,9 @@ export default {
         router.replace('/'); // return to the home page and don't continue executing the code
         return {};
       }
+      sessionId.value = room.sessionId;
+
+
 
       room.state.listen('timer', (currentValue, previousValue) => {
         timer.value = currentValue;
@@ -93,6 +100,19 @@ export default {
         // Update playerUsernames when the players change
         choices.value = Array.from(room.state.answers.values());
       });
+
+      // room.state.listen('players', (currentValue, previousValue) => {
+      //   console.log("FFOOO")
+      //   playersList.value = Array.from(room.state.players.values());
+      // });
+      room.state.players.forEach((playerInstance, playerId) => {
+        // Attach listeners to each player instance
+        playerInstance.onChange((currentValue, previousValue) => {
+          // Handle changes to the property for this player here
+          playersList.value = room.state.players;
+          // console.log(`Player ${playerId} property changed: ${currentValue}`);
+        });
+      })
 
 
       console.log(room);
@@ -127,7 +147,9 @@ export default {
       responded,
       flashing,
       respond,
-      question_category
+      question_category,
+      playersList,
+      sessionId
     };
   },
 };
