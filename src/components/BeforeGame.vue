@@ -18,7 +18,7 @@
             <font-awesome-icon :icon="['fas', 'key']"/>
             Room code
           </h3>
-          <span class="badge rounded-pill text-bg-warning fs-2 font-monospace">{{ roomId }}</span>
+          <span class="badge rounded-pill text-bg-warning fs-2">{{ roomId }}</span>
         </div>
         <div class="d-grid gap-1">
           <button class="btn btn-success mt-4 shadow-lg" @click="startGame">Start Game</button>

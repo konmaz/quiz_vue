@@ -19,19 +19,23 @@ export default {
         </h3>
       </div>
       <div class="card-body">
-        <table class="table">
+        <table class="table ">
           <tbody>
-          <tr v-for="(username, index) in playerUsernames" :key="index">
-            <td class="fw-light">
-              <font-awesome-icon :icon="['fas', 'user']" class="text-primary"/>
+          <tr v-for="(username, index) in playerUsernames" :key="index"
+              :class="{'fw-bolder table-primary' : index === 0}">
+            <td>
+              <font-awesome-icon
+                  :icon="['fas', 'user']"
+                  class="text-primary"
+              />
               {{ username }}
             </td>
-            <td class="fw-semibold">
+            <td>
               <span v-for="heartIndex in 3">
-            <font-awesome-icon :key="heartIndex" :icon="['fas', 'heart']" class="text-danger"/>
+            <font-awesome-icon :key="heartIndex" :icon="['fas', 'heart']" class="text-danger fw-bolder"/>
           </span>
             </td>
-            <td class="fw-semibold">
+            <td>
               1500
             </td>
           </tr>
