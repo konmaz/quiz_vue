@@ -24,7 +24,7 @@
                    placeholder="Room Code"
                    v-model="gameCode"
                    @input="limitGameCodeInput"
-                   class="form-control rounded-pill text-md-center fw-semibold"
+                   class="form-control rounded-pill text-center fw-semibold"
             >
           </div>
           <div class="col">
@@ -81,9 +81,9 @@ export default {
 
     const createGame = async () => {
       const loader = $loading.show({loader: 'dots'});
-      client = new Client('http://localhost:2567');
+      client = new Client('http://192.168.1.5:2567');
       room = await client.create('my_room', {username: userName.value});
-
+      localStorage.setItem('reconnectionToken', room.reconnectionToken);
       console.log(room);
 
       await store.dispatch('updateRoom', room);
@@ -95,10 +95,11 @@ export default {
     const joinGame = async () => {
       errorJoin.value = false; // Use errorJoin as a ref directly
       const loader = $loading.show({loader: 'dots'});
-      client = new Client('http://localhost:2567');
+      client = new Client('http://192.168.1.5:2567');
       try {
         room = await client.joinById(gameCode.value, {username: userName.value});
         await store.dispatch('updateRoom', room);
+        localStorage.setItem('reconnectionToken', room.reconnectionToken);
         await router.replace('/pre_game');
         loader.hide();
       } catch (e) {

@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <div v-if="!gameOver">
     <div class="card mt-2">
       <div class="card-body shadow-lg">
         <div class="d-flex justify-content-between">
@@ -10,6 +11,9 @@
         </div>
         <p class="card-text fs-4 prevent-select" v-html="question"></p>
       </div>
+    </div>
+    <div class="alert alert-danger mt-2 text-center" role="alert" v-if="isPlayerDead">
+      You have run out of lives <font-awesome-icon :icon="['fa', 'heart']"/>, and can't respond to questions
     </div>
 
     <div class="quiz-grid mt-4 gap-3">
@@ -22,11 +26,26 @@
           :class="{
           'selected': selectedChoice === choice,
           'blink_me btn-primary': selectedChoice === choice && !showResult,
-          'disabled': responded,
+          'disabled': responded || isPlayerDead,
           'wrong_answer': showResult && selectedChoice === choice && choice !== correctChoice,
           'correct_answer blink_me_faster': showResult && choice === correctChoice,
         }"
       ></button>
+    </div>
+    </div>
+
+    <div v-if="gameOver">
+      <div class="card mx-auto shadow-lg mt-3" style="width: 20em">
+        <div class="card-header"></div>
+        <div class="card-body">
+          <div class="text-center">
+            <h3>Game Over</h3>
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-success mt-4 shadow-lg" @click="handleGameOver">Play again</button>
+          </div>
+        </div>
+      </div>
     </div>
     <Scoreboard :foo="playersList" :player-i-d="sessionId"></Scoreboard>
   </div>
@@ -37,13 +56,16 @@ import {ref, computed, onMounted} from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import Scoreboard from "./Scoreboard.vue";
+import {Client} from "colyseus.js";
+
+
 
 export default {
   components: {Scoreboard},
   setup() {
     const store = useStore();
     const router = useRouter();
-    const room = store.state.room;
+    let room = store.state.room;
 
     const sessionId = ref('');
 
@@ -58,19 +80,60 @@ export default {
     const correctChoice = ref('Justin Bieber');
     const showResult = ref(false);
 
+    const isPlayerDead = ref(false);
+    const gameOver = ref(false);
+
     const isCorrect = computed(() => selectedChoice.value === correctChoice.value);
 
     const responded = ref(true);
     const flashing = ref(false);
 
-    onMounted(() => {
-
+    const fetchRoom = async () => {
+      console.log("Room state is:");
+      console.log(room);
       if (room == null) {
-        router.replace('/'); // return to the home page and don't continue executing the code
+        try {
+          let client = new Client('http://192.168.1.5:2567');
+          room = await client.reconnect(localStorage.getItem('reconnectionToken'));
+          localStorage.setItem('reconnectionToken', room.reconnectionToken);
+          await store.dispatch('updateRoom', room);
+          console.log("joined successfully", room);
+        } catch (e) {
+          console.error("join error", e);
+          await router.replace('/'); // return to the home page and don't continue executing the code after
+        }
+      }
+    };
+
+
+
+    const handleGameOver = () =>{
+      room.removeAllListeners();
+      room.leave();
+      router.push('/');
+    }
+
+    onMounted(async () => {
+
+      await fetchRoom();
+      if (room === null) {
+        await router.replace('/'); // return to the home page and don't continue executing the code
         return {};
+      }
+
+      if (room.state.gameOver){
+        gameOver.value = true;
       }
       sessionId.value = room.sessionId;
 
+      room.state.listen('gameOver', (currentValue, previousValue) => {
+        if (currentValue)
+          gameOver.value = true;
+      });
+
+      // room.onLeave((code) => { TODO : examine the state when the client disconnect eg. WiFi loss
+      //   router.replace('/game');
+      // });
 
 
       room.state.listen('timer', (currentValue, previousValue) => {
@@ -101,21 +164,18 @@ export default {
         choices.value = Array.from(room.state.answers.values());
       });
 
-      // room.state.listen('players', (currentValue, previousValue) => {
-      //   console.log("FFOOO")
-      //   playersList.value = Array.from(room.state.players.values());
-      // });
-      room.state.players.forEach((playerInstance, playerId) => {
-        // Attach listeners to each player instance
-        playerInstance.onChange((currentValue, previousValue) => {
-          // Handle changes to the property for this player here
-          playersList.value = room.state.players;
-          // console.log(`Player ${playerId} property changed: ${currentValue}`);
-        });
+      room.state.players.onChange((value, key) => {
+        playersList.value = Array.from(room.state.players.values())
+        if(!room.state.players.get(room.sessionId).lives && !room.state.gameOver)
+          isPlayerDead.value = true;
       })
 
+      room.onMessage("updated_scores", (message) => {
+        playersList.value = Array.from(room.state.players.values())
+        if(room.state.players.get(room.sessionId).lives === 0 && !room.state.gameOver)
+          isPlayerDead.value = true;
+      });
 
-      console.log(room);
     });
 
     const respond = (choice) => {
@@ -149,7 +209,10 @@ export default {
       respond,
       question_category,
       playersList,
-      sessionId
+      sessionId,
+      isPlayerDead,
+      gameOver,
+      handleGameOver
     };
   },
 };

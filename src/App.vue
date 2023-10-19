@@ -12,7 +12,7 @@
 
   <div class="fixed-bottom p-5 d-flex justify-content-end">
     <button class="btn btn-outline-secondary btn-lg" @click="toggleTheme">
-      <font-awesome-icon :icon="theme === 'dark' ? ['fas', 'sun'] : ['fas', 'moon']" />
+      <font-awesome-icon :icon="theme === 'dark' ? ['fas', 'moon'] : ['fas', 'sun']" />
     </button>
   </div>
 
@@ -44,7 +44,7 @@ export default {
   setup() {
     const body = ref(document.documentElement);
 
-    const theme = ref(localStorage.getItem('theme') || 'white'); // Load theme from localStorage
+    const theme = ref(localStorage.getItem('theme') || (  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')); // Load theme from localStorage
     body.value.setAttribute('data-bs-theme', theme.value);
     // Function to toggle the theme
     const toggleTheme = () => {

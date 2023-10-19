@@ -12,25 +12,26 @@
       <div class="card-body">
         <table class="table ">
           <tbody>
-          <tr v-for="[key, value] of foo"
-              :key="key"
-              :class="{'fw-bolder table-primary' : key === playerID}"
+          <tr v-for="(object, index) of sortedPlayers"
+              :key="index"
+              :class="{'fw-bolder table-secondary ' : object.sessionId === playerID}"
           >
-<!--            <td>{{ (index +1)+nth(index + 1) }}</td>-->
+            <td>{{ (index +1)+nth(index + 1) }}</td>
             <td>
               <font-awesome-icon
                   :icon="['fas', 'user']"
-                  class="text-primary"
+                  class="text-danger"
               />
-              {{ value.username }}
+              {{ object.username }}
             </td>
             <td>
-              <span v-for="heartIndex in value.lives">
-            <font-awesome-icon :key="heartIndex" :icon="['fas', 'heart']" class="text-danger fw-bolder"/>
+              <font-awesome-icon v-if="object.lives === 0" :icon="['fas', 'face-dizzy']"/>
+              <span v-for="heartIndex in object.lives">
+              <font-awesome-icon :key="heartIndex" :icon="['fas', 'heart']" class="text-danger fw-bolder"/>
           </span>
             </td>
             <td>
-              {{value.score}}
+              {{object.score}}
             </td>
           </tr>
           </tbody>
@@ -47,11 +48,17 @@
 </style>
 <script>
 let foo;
+
 export default {
   name: "Scoreboard",
   props:{
     foo: Array,
     playerID: String,
+  },
+  computed: {
+    sortedPlayers(){
+      return this.foo.slice().sort((a, b) => b.score - a.score);
+    }
   },
   data() {
     return {

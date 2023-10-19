@@ -11,7 +11,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faUsers, faUser, faKey, faTriangleExclamation, faClock, faHeart, faMoon, faSun} from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faUser, faKey, faTriangleExclamation, faClock, faHeart, faMoon, faSun, faFaceDizzy} from '@fortawesome/free-solid-svg-icons'
 
 library.add(faUsers);
 library.add(faUser);
@@ -21,6 +21,7 @@ library.add(faClock);
 library.add(faHeart);
 library.add(faMoon);
 library.add(faSun);
+library.add(faFaceDizzy);
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';

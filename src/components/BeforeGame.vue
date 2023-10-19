@@ -13,7 +13,7 @@
         <!--        <div class="alert alert-danger" role="alert">-->
         <!--          Can't join! -->
         <!--        </div>-->
-        <div class="text-md-center">
+        <div class="text-center">
           <h3>
             <font-awesome-icon :icon="['fas', 'key']"/>
             Room code
@@ -25,7 +25,7 @@
           <button class="btn btn-danger mt-4" @click="exitGame">Exit</button>
         </div>
 
-        <div class="text-md-center">
+        <div class="text-center">
           <h3 class="mt-4 fw-light">
             <font-awesome-icon :icon="['fas', 'users']" class="text-secondary"/>
             Players
@@ -57,45 +57,66 @@
 
 <script>
 import {useStore} from 'vuex';
-import {onUnmounted, ref} from 'vue';
+import {onMounted, onUnmounted, ref} from 'vue';
 import {useRouter} from "vue-router";
+import {Client} from "colyseus.js";
 
 export default {
   name: 'BeforeGame',
   setup() {
 
-    let roomId = 0;
-    const store = useStore();
-    const router = useRouter();
-    const room = store.state.room;
-
-    if (room == null) {
-      router.replace('/'); // return to home page and don't continue executing the code after
-      return {
-        roomId,
-        playerUsernames: [],
-        exitGame: () => {
-        }
-      }
-    }
-
-
-    roomId = room.roomId;
+    const roomId = ref(0);
     const playerUsernames = ref([]);
 
-    room.state.listen("trivia_category", (currentValue, previousValue) => {
-      console.log(`trivia_category is now ${currentValue}`);
-      console.log(`trivia_category value was: ${previousValue}`);
-    });
+    const store = useStore();
+    const router = useRouter();
+    let room = store.state.room;
 
-    room.onMessage("players_get_ready", (message) => {
-      router.replace("/game")
-    });
 
-    room.state.players.onChange((value, key) => {
-      // Update playerUsernames when the players change
-      playerUsernames.value = Array.from(room.state.players.values()).map((player) => player.username);
-    });
+    const fetchRoom = async () => {
+      console.log("Room state is:")
+      console.log(room);
+      if (room == null) {
+        try {
+          let client = new Client('http://192.168.1.5:2567');
+          room = await client.reconnect(localStorage.getItem('reconnectionToken'));
+          localStorage.setItem('reconnectionToken', room.reconnectionToken);
+          console.log("joined successfully", room);
+          await store.dispatch('updateRoom', room);
+
+        } catch (e) {
+          console.error("join error", e);
+          await router.replace('/'); // return to home page and don't continue executing the code after
+          return {
+            roomId,
+            playerUsernames: [],
+            exitGame: () => {
+            }
+          }
+        }
+      }
+
+      roomId.value = room.roomId;
+
+      // room.state.listen("trivia_category", (currentValue, previousValue) => {
+      //   console.log(`trivia_category is now ${currentValue}`);
+      //   console.log(`trivia_category value was: ${previousValue}`);
+      // });
+
+      room.onMessage("players_get_ready", (message) => {
+        router.replace("/game")
+      });
+
+      room.state.players.onChange((value, key) => {
+        // Update playerUsernames when the players change
+        playerUsernames.value = Array.from(room.state.players.values()).map((player) => player.username);
+      });
+
+    }
+
+    onMounted( async () => {
+      await fetchRoom();
+    })
 
     const startGame = () =>{
       room.send('start_game')
