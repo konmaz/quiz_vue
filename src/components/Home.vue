@@ -3,9 +3,7 @@
 
   <div class="container">
     <div class="card mx-auto shadow-lg mt-3" style="width: 20em">
-      <div class="card-header">
-        Quiz.io
-      </div>
+      <div class="card-header">Quiz</div>
       <div class="card-body text-center">
         <input type="text" placeholder="Please fill your Name first" v-model="userName" class="form-control"
                autofocus>

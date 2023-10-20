@@ -7,7 +7,7 @@
 
     <div class="card mx-auto shadow-lg mt-3" style="width: 20em">
       <div class="card-header">
-        Quiz.io Lobby
+        Quiz Lobby
       </div>
       <div class="card-body">
         <!--        <div class="alert alert-danger" role="alert">-->
