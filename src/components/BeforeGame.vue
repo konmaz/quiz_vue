@@ -78,7 +78,7 @@ export default {
       console.log(room);
       if (room == null) {
         try {
-          let client = new Client('http://192.168.1.5:2567');
+          let client = new Client(import.meta.env.VITE_SERVER_ADDRESS);
           room = await client.reconnect(localStorage.getItem('reconnectionToken'));
           localStorage.setItem('reconnectionToken', room.reconnectionToken);
           console.log("joined successfully", room);

@@ -3,13 +3,13 @@
     <div v-if="!gameOver">
     <div class="card mt-2">
       <div class="card-body shadow-lg">
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between align-items-center">
           <p class="text-start fw-light">{{ question_category }}</p>
           <div class="fs-4 text-end">
             <p class="fw-light">{{ timer }} <font-awesome-icon :icon="['fa', 'clock']"/></p>
           </div>
         </div>
-        <p class="card-text fs-4 prevent-select" v-html="question"></p>
+        <p class="card-text fs-4 prevent-select text" v-html="question"></p>
       </div>
     </div>
     <div class="alert alert-danger mt-2 text-center" role="alert" v-if="isPlayerDead">
@@ -93,7 +93,7 @@ export default {
       console.log(room);
       if (room == null) {
         try {
-          let client = new Client('http://192.168.1.5:2567');
+          let client = new Client(import.meta.env.VITE_SERVER_ADDRESS);
           room = await client.reconnect(localStorage.getItem('reconnectionToken'));
           localStorage.setItem('reconnectionToken', room.reconnectionToken);
           await store.dispatch('updateRoom', room);
@@ -131,9 +131,10 @@ export default {
           gameOver.value = true;
       });
 
-      // room.onLeave((code) => { TODO : examine the state when the client disconnect eg. WiFi loss
-      //   router.replace('/game');
-      // });
+      room.onLeave((code) => { //TODO : examine the state when the client disconnect eg. WiFi loss
+        alert("You are offline!")
+        router.replace('/game');
+      });
 
 
       room.state.listen('timer', (currentValue, previousValue) => {

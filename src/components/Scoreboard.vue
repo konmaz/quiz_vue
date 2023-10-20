@@ -14,7 +14,7 @@
           <tbody>
           <tr v-for="(object, index) of sortedPlayers"
               :key="index"
-              :class="{'fw-bolder table-secondary ' : object.sessionId === playerID}"
+              :class="{'fw-bolder' : object.sessionId === playerID}"
           >
             <td>{{ (index +1)+nth(index + 1) }}</td>
             <td>

@@ -81,7 +81,7 @@ export default {
 
     const createGame = async () => {
       const loader = $loading.show({loader: 'dots'});
-      client = new Client('http://192.168.1.5:2567');
+      client = new Client(import.meta.env.VITE_SERVER_ADDRESS);
       room = await client.create('my_room', {username: userName.value});
       localStorage.setItem('reconnectionToken', room.reconnectionToken);
       console.log(room);
@@ -95,7 +95,7 @@ export default {
     const joinGame = async () => {
       errorJoin.value = false; // Use errorJoin as a ref directly
       const loader = $loading.show({loader: 'dots'});
-      client = new Client('http://192.168.1.5:2567');
+      client = new Client(import.meta.env.VITE_SERVER_ADDRESS);
       try {
         room = await client.joinById(gameCode.value, {username: userName.value});
         await store.dispatch('updateRoom', room);
