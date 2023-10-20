@@ -110,7 +110,7 @@ export default {
     const handleGameOver = () =>{
       room.removeAllListeners();
       room.leave();
-      router.push('/');
+      router.replace('/');
     }
 
     onMounted(async () => {
@@ -131,9 +131,8 @@ export default {
           gameOver.value = true;
       });
 
-      room.onLeave((code) => { //TODO : examine the state when the client disconnect eg. WiFi loss
-        alert("You are offline!")
-        router.replace('/game');
+      room.onLeave(async (code) => { //TODO : examine the state when the client disconnect eg. WiFi loss
+        vm.$forceUpdate();
       });
 
 
