@@ -132,9 +132,8 @@ export default {
       });
 
       room.onLeave(async (code) => { //TODO : examine the state when the client disconnect eg. WiFi loss
-        console.log("You have disconnected from the game");
-        await new Promise(r => setTimeout(r, 1000));
-        await fetchRoom();
+        alert("You have disconnected from the game");
+        location.reload();
 
       });
 
