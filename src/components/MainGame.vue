@@ -132,7 +132,10 @@ export default {
       });
 
       room.onLeave(async (code) => { //TODO : examine the state when the client disconnect eg. WiFi loss
-        vm.$forceUpdate();
+        console.log("You have disconnected from the game");
+        await new Promise(r => setTimeout(r, 1000));
+        await fetchRoom();
+
       });
 
 
@@ -168,6 +171,8 @@ export default {
         playersList.value = Array.from(room.state.players.values())
         if(!room.state.players.get(room.sessionId).lives && !room.state.gameOver)
           isPlayerDead.value = true;
+        if(room.state.players.get(room.sessionId).player_answer !== "" && !showResult.value)  // Update the player UI if the player reconnects
+          respond(room.state.players.get(room.sessionId).player_answer);
       })
 
       room.onMessage("updated_scores", (message) => {
