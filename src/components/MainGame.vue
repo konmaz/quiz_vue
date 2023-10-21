@@ -18,7 +18,7 @@
 
     <div class="quiz-grid mt-4 gap-3">
       <button
-          class="p-3 btn btn-secondary fs-3 shadow"
+          class="p-3 btn btn-secondary fs-3 shadow text-wrap"
           v-for="(choice, index) in choices"
           :key="index"
           v-html="choice"
@@ -132,9 +132,8 @@ export default {
       });
 
       room.onLeave(async (code) => { //TODO : examine the state when the client disconnect eg. WiFi loss
-        alert("You have disconnected from the game");
-        location.reload();
-
+        alert("You have disconnected from the game press OK to reconnect");
+        await fetchRoom();
       });
 
 
