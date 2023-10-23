@@ -60,10 +60,6 @@ export default {
       return this.foo.slice().sort((a, b) => b.score - a.score);
     }
   },
-  data() {
-    return {
-    }
-  },
   methods:{
     nth(n) {
       return ["st", "nd", "rd"][((n + 90) % 100 - 10) % 10 - 1] || "th"

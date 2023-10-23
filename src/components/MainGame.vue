@@ -77,7 +77,7 @@ export default {
     const playersList = ref([]);
 
     const selectedChoice = ref(null);
-    const correctChoice = ref('Justin Bieber');
+    const correctChoice = ref('');
     const showResult = ref(false);
 
     const isPlayerDead = ref(false);
@@ -126,26 +126,26 @@ export default {
       }
       sessionId.value = room.sessionId;
 
-      room.state.listen('gameOver', (currentValue, previousValue) => {
+      room.state.listen('gameOver', (currentValue) => {
         if (currentValue)
           gameOver.value = true;
       });
 
-      room.onLeave(async (code) => { //TODO : examine the state when the client disconnect eg. WiFi loss
+      room.onLeave(async () => { //TODO : examine the state when the client disconnect eg. WiFi loss
         alert("You have disconnected from the game press OK to reconnect");
         await fetchRoom();
       });
 
 
-      room.state.listen('timer', (currentValue, previousValue) => {
+      room.state.listen('timer', (currentValue) => {
         timer.value = currentValue;
       });
 
-      room.state.listen('questionCategory', (currentValue, previousValue) => {
+      room.state.listen('questionCategory', (currentValue) => {
         question_category.value = currentValue;
       });
 
-      room.state.listen('correctAnswer', (currentValue, previousValue) => {
+      room.state.listen('correctAnswer', (currentValue) => {
         correctChoice.value = currentValue;
         if (currentValue !== ""){
           showResult.value = true;
@@ -155,17 +155,17 @@ export default {
           resetQuestionState();
       });
 
-      room.state.listen('question', (currentValue, previousValue) => {
+      room.state.listen('question', (currentValue) => {
         resetQuestionState();
         question.value = currentValue;
       });
 
-      room.state.answers.onChange((value, key) => {
+      room.state.answers.onChange(() => {
         // Update playerUsernames when the players change
         choices.value = Array.from(room.state.answers.values());
       });
 
-      room.state.players.onChange((value, key) => {
+      room.state.players.onChange(() => {
         playersList.value = Array.from(room.state.players.values())
         if(!room.state.players.get(room.sessionId).lives && !room.state.gameOver)
           isPlayerDead.value = true;
@@ -173,7 +173,7 @@ export default {
           respond(room.state.players.get(room.sessionId).player_answer);
       })
 
-      room.onMessage("updated_scores", (message) => {
+      room.onMessage("updated_scores", () => {
         playersList.value = Array.from(room.state.players.values())
         if(room.state.players.get(room.sessionId).lives === 0 && !room.state.gameOver)
           isPlayerDead.value = true;
@@ -186,7 +186,6 @@ export default {
         selectedChoice.value = choice;
         responded.value = true;
         room.send('answer_question', {answer:choice})
-        // setTimeout(() => (showResult.value = true), 3000);
       }
     };
 
